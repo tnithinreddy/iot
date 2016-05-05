@@ -1,6 +1,8 @@
 import urllib2
 import time
+import datetime
 import thread
+import RPi.GPIO as GPIO
 
 sensor1 = 100
 sensor2 = 200
@@ -9,7 +11,8 @@ sensor4 = 500
 cycletime = 1
 
 num = 7
-inp = 16
+inp = 18
+GPIO.setmode(GPIO.BOARD)
 GPIO.setup(inp, GPIO.IN)         #Read output from PIR motion sensor
 GPIO.setup(num, GPIO.OUT)
 
@@ -37,8 +40,18 @@ def sequence(count1,count2,count3,count4):
     print 'done successfully'
 def sendDataToServer(desc):
     print desc
+    global sensor1
     while True:
-        count1=sensor1/100
+        x=datetime.datetime.now()
+	hours=x.hour
+        minutes=x.minute
+        seconds=x.second
+
+        server = 'http://chillar.esy.es/address1.php?count='+str(sensor1)+'&junctionName='+'DAIICT,Gandhinagar'+'&hh='+str(hours)
+        server=server+'&mm='+str(minutes)	
+        count1=float(sensor1)/100
+        print count1
+        sensor1=0
         count2=sensor2/100
         count3=sensor3/100
         count4=sensor4/100
@@ -50,13 +63,15 @@ def sendDataToServer(desc):
             count3=5
         if count4>5:
             count4=5
-        sequence(count1,count2,count3,count4)
+
+        print server
+ 	urllib2.urlopen(server)
+	sequence(count1,count2,count3,count4)
 def collectSensorData(desc):
     global sensor1
     global sensor2
     global sensor3
     global sensor4
-    sensor1 = 0
     print desc
     print sensor1
     while True:

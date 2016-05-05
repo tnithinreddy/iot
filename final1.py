@@ -36,7 +36,7 @@ while True:
     count2=sensor2/100
     count3=sensor3/100
     count4=sensor4/100
-	if count1>5:
+    if count1>5:
         count1=5
     if count2>5:
         count2=5
